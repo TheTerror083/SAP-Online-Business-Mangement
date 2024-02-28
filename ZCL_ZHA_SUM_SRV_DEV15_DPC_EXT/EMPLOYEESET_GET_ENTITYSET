@@ -1,0 +1,8 @@
+  method EMPLOYEESET_GET_ENTITYSET.
+
+      CALL METHOD zcl_services_dev15=>get_all_employees
+        IMPORTING
+          et_employees            = et_entityset
+          .
+
+  endmethod.

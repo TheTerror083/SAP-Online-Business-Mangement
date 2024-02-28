@@ -1,0 +1,35 @@
+  method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_EXPANDED_ENTITY.
+
+  DATA: lv_department_id type za_department_id_dev15,
+        ls_result        type zcl_services_dev15=>zdepartment_and_employees.
+
+
+    DATA(lt_keys) = io_tech_request_context->get_keys( ).
+
+
+LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+  CASE <ls_key>-name.
+    WHEN 'DEPARTMENT_ID'.
+      lv_department_id = <ls_key>-value.
+    ENDCASE.
+ENDLOOP.
+
+  CASE iv_entity_name.
+    WHEN zcl_zha_sum_srv_dev15_mpc=>gc_department.
+
+      CALL METHOD zcl_services_dev15=>get_employees_of_manager
+        EXPORTING
+          iv_department_id = lv_department_id
+        IMPORTING
+          es_result     =    ls_result " Table type of emplyees table.
+        .
+
+     copy_data_to_ref(
+       EXPORTING
+         is_data = ls_result
+       CHANGING
+         cr_data = er_entity
+     ).
+  ENDCASE.
+
+  endmethod.

@@ -1,0 +1,551 @@
+class ZCL_SERVICES_DEV15 definition
+  public
+  final
+  create public .
+
+public section.
+
+  types:
+    begin of ZDEPARTMENT_AND_EMPLOYEES.
+    INCLUDE TYPE ZCL_ZHA_SUM_SRV_DEV15_MPC=>ts_department.
+     TYPES: employees_and_salaries TYPE STANDARD TABLE OF zemployee_and_salary_dev15 with DEFAULT KEY,
+     END OF  ZDEPARTMENT_AND_EMPLOYEES .
+
+  class-methods ADD_EMPLOYEE_AND_SALARY
+    importing
+      !IS_EMPLOYEE_SALARY type ZEMPLOYEE_AND_SALARY_DEV15
+    exporting
+      !ES_EMPLOYEE_SALARY type ZEMPLOYEE_AND_SALARY_DEV15
+    exceptions
+      ALREADY_EXISTS
+      MISSING_DATA
+      INCOMPATIBLE_DATE .
+  class-methods ADD_SALARY
+    importing
+      !IS_SALARY type ZSALARY_DEV15
+    exporting
+      !EV_SALARY_ID type ZA_SALARY_ID_DEV15 .
+  class-methods GET_EMPLOYEES_OF_MANAGER
+    importing
+      !IV_DEPARTMENT_ID type ZA_DEPARTMENT_ID_DEV15
+    exporting
+      !ES_RESULT type ZDEPARTMENT_AND_EMPLOYEES .
+  class-methods GET_ALL_MANAGERS
+    exporting
+      !ET_MANAGERS type ZTT_EMPLOYEES_AND_DEPART_DEV15 .
+  class-methods GET_ALL_EMPLOYEES
+    exporting
+      !ET_EMPLOYEES type ZTT_EMPLOYEES_DEV15 .
+  class-methods GET_DEPARTMENT_BY_ID
+    importing
+      !IV_DEPARTMENT_ID type ZA_DEPARTMENT_ID_DEV15
+    exporting
+      !ES_DEPARTMENT type ZDEPARTMENT_DEV15 .
+  class-methods DELETE_FROM_SERVICE_TABLE
+    importing
+      !IS_EMPLOYEE type ZEMPLOYEE_DEV15 optional
+      !IS_SALARY type ZSALARY_DEV15 optional
+      !IS_DEPARTMENT type ZDEPARTMENT_DEV15 optional
+      !IS_POSITION type ZPOSITION_DEV15 optional
+      !IT_EMPLOYEES type ZTT_EMPLOYEES_DEV15 optional
+      !IT_SALARIES type ZTT_SALARIES_DEV15 optional
+      !IT_DEPARTMENTS type ZTT_DEPARTMENTS_DEV15 optional
+      !IT_POSITIONS type ZTT_POSITIONS_DEV15 optional
+    exceptions
+      NOT_FOUND .
+  class-methods INSERT_TO_SERVICE_TABLE
+    importing
+      !IS_EMPLOYEE type ZEMPLOYEE_DEV15 optional
+      !IS_SALARY type ZSALARY_DEV15 optional
+      !IS_DEPARTMENT type ZDEPARTMENT_DEV15 optional
+      !IS_POSITION type ZPOSITION_DEV15 optional
+      !IT_EMPLOYEES type ZTT_EMPLOYEES_DEV15 optional
+      !IT_SALARIES type ZTT_SALARIES_DEV15 optional
+      !IT_DEPARTMENTS type ZTT_DEPARTMENTS_DEV15 optional
+      !IT_POSITIONS type ZTT_POSITIONS_DEV15 optional
+    exceptions
+      ALREADY_EXISTS
+      MISSING_DATA .
+  class-methods UPDATE_SERVICE_TABLE
+    importing
+      !IS_EMPLOYEE type ZEMPLOYEE_DEV15 optional
+      !IS_DEPARTMENT type ZDEPARTMENT_DEV15 optional
+      !IS_POSITION type ZPOSITION_DEV15 optional
+      !IS_SALARY type ZSALARY_DEV15 optional
+      !IT_EMPLOYEES type ZTT_EMPLOYEES_DEV15 optional
+      !IT_DEPARTMENTS type ZTT_DEPARTMENTS_DEV15 optional
+      !IT_POSITIONS type ZTT_POSITIONS_DEV15 optional
+      !IT_SALARIES type ZTT_SALARIES_DEV15 optional
+    exceptions
+      NOT_FOUND
+      ALREADY_EXISTS .
+  class-methods GET_ALL_SALARIES
+    importing
+      !IT_EMPLOYEE_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+    exporting
+      !ET_SALARIES type ZTT_SALARIES_DEV15 .
+  class-methods GET_ALL_POSITIONS
+    exporting
+      !ET_POSITIONS type ZTT_POSITIONS_DEV15 .
+  class-methods GIVE_RAISE
+    importing
+      !IS_SALARY type ZSALARY_DEV15
+    exporting
+      !ES_SALARY type ZSALARY_DEV15 .
+protected section.
+private section.
+
+  class-methods GENERATE_ID
+    exporting
+      !EV_ID type CHAR8 .
+ENDCLASS.
+
+
+
+CLASS ZCL_SERVICES_DEV15 IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>ADD_EMPLOYEE_AND_SALARY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_EMPLOYEE_SALARY             TYPE        ZEMPLOYEE_AND_SALARY_DEV15
+* | [<---] ES_EMPLOYEE_SALARY             TYPE        ZEMPLOYEE_AND_SALARY_DEV15
+* | [EXC!] ALREADY_EXISTS
+* | [EXC!] MISSING_DATA
+* | [EXC!] INCOMPATIBLE_DATE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_employee_and_salary.
+    DATA: id_is_available TYPE abap_bool VALUE abap_false,
+          ls_employee TYPE zemployee_dev15,
+          lv_emp_id TYPE char8,
+          ls_salary TYPE zsalary_dev15.
+
+    WHILE id_is_available = abap_false.
+
+      CALL METHOD zcl_services_dev15=>generate_id
+        IMPORTING
+          ev_id  = lv_emp_id
+          .
+     SELECT SINGLE * FROM zemployees_dev15
+       WHERE employee_id = @lv_emp_id
+       INTO @ls_employee.
+
+       IF ls_employee IS INITIAL.
+         id_is_available = abap_true.
+       ENDIF.
+    ENDWHILE.
+
+MOVE-CORRESPONDING is_employee_salary TO ls_employee.
+MOVE-CORRESPONDING is_employee_salary TO ls_salary.
+
+    ls_employee-employee_id = lv_emp_id.
+    ls_salary-employee_id = lv_emp_id.
+
+
+**************** add the employee's salary *******************
+    CALL METHOD zcl_services_dev15=>add_salary
+      EXPORTING
+        is_salary        = ls_salary
+      IMPORTING
+        ev_salary_id     = ls_employee-salary_id  "assigns the new salary id to the new employee.
+        .
+
+*************************** insert the employee to the table ****************
+CALL METHOD zcl_services_dev15=>insert_to_service_table
+  EXPORTING
+    is_employee    = ls_employee
+  EXCEPTIONS
+    already_exists = 1
+    missing_data   = 2
+    others         = 3
+        .
+CASE sy-subrc.
+  WHEN 1.
+    RAISE already_exists.
+  WHEN 2.
+    RAISE missing_data.
+ENDCASE.
+
+MOVE-CORRESPONDING is_employee_salary TO es_employee_salary.
+es_employee_salary-employee_id = ls_employee-employee_id.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>ADD_SALARY
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_SALARY                      TYPE        ZSALARY_DEV15
+* | [<---] EV_SALARY_ID                   TYPE        ZA_SALARY_ID_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_salary.
+    DATA: ls_salary TYPE zsalary_dev15,
+          lv_id_is_available TYPE abap_bool VALUE abap_false.
+
+ WHILE lv_id_is_available = abap_false.
+    CALL METHOD zcl_services_dev15=>generate_id
+      IMPORTING
+        ev_id  = ev_salary_id         "instead of creating another local variable
+        .                             "I decided to use the exporting salary id to save resources.
+
+    SELECT SINGLE * FROM zsalaries_dev15
+      WHERE salary_id = @ev_salary_id
+      INTO @ls_salary.
+
+      IF  ls_salary IS INITIAL.
+        lv_id_is_available = abap_true.
+      ENDIF.
+ ENDWHILE.
+
+MOVE-CORRESPONDING is_salary TO ls_salary.
+ ls_salary-salary_id = ev_salary_id.
+ ls_salary-effective_date = sy-datum.
+
+CALL METHOD zcl_services_dev15=>insert_to_service_table
+  EXPORTING
+    is_salary      = ls_salary
+    .
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>DELETE_FROM_SERVICE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_EMPLOYEE                    TYPE        ZEMPLOYEE_DEV15(optional)
+* | [--->] IS_SALARY                      TYPE        ZSALARY_DEV15(optional)
+* | [--->] IS_DEPARTMENT                  TYPE        ZDEPARTMENT_DEV15(optional)
+* | [--->] IS_POSITION                    TYPE        ZPOSITION_DEV15(optional)
+* | [--->] IT_EMPLOYEES                   TYPE        ZTT_EMPLOYEES_DEV15(optional)
+* | [--->] IT_SALARIES                    TYPE        ZTT_SALARIES_DEV15(optional)
+* | [--->] IT_DEPARTMENTS                 TYPE        ZTT_DEPARTMENTS_DEV15(optional)
+* | [--->] IT_POSITIONS                   TYPE        ZTT_POSITIONS_DEV15(optional)
+* | [EXC!] NOT_FOUND
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method DELETE_FROM_SERVICE_TABLE.
+
+********************** EMPLOYEES ***********************
+    IF it_employees is not INITIAL.                        "check if the table has values
+      DELETE zemployees_dev15 FROM TABLE @it_employees.
+      ELSEIF is_employee is NOT INITIAL.                    "check if the structure haas values
+        DELETE zemployees_dev15 FROM @is_employee.          "NOTE: if both the structure and the table have values,
+    ENDIF.                                                  "      only the table will be used.
+
+********************* DEOPARTMENTS *********************
+        IF it_departments is not INITIAL.
+      DELETE zdeparts_dev15 FROM TABLE @it_departments.
+      ELSEIF is_department is NOT INITIAL.
+        DELETE zdeparts_dev15 FROM @is_department.
+    ENDIF.
+
+******************** POSITIONS ************************
+    IF it_positions is not INITIAL.
+      DELETE zpositions_dev15 FROM TABLE @it_positions.
+      ELSEIF is_position is NOT INITIAL.
+        DELETE zpositions_dev15 FROM @is_position.
+    ENDIF.
+
+******************* SALARIES *************************
+    IF it_salaries is not INITIAL.
+      DELETE zsalaries_dev15 FROM TABLE @it_salaries.
+      ELSEIF is_salary is NOT INITIAL.
+        DELETE zsalaries_dev15 FROM @is_salary.
+    ENDIF.
+
+    IF  sy-subrc = 4.
+      RAISE not_found.
+    ENDIF.
+
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Private Method ZCL_SERVICES_DEV15=>GENERATE_ID
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] EV_ID                          TYPE        CHAR8
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GENERATE_ID.
+    DATA: lv_random_id type i.
+
+     CALL FUNCTION 'QF05_RANDOM_INTEGER' "Generate a random number
+       EXPORTING
+         RAN_INT_MAX         = 9999999
+         RAN_INT_MIN         = 1000000
+       IMPORTING
+         RAN_INT             = lv_random_id
+       EXCEPTIONS
+         INVALID_INPUT       = 1
+         OTHERS              = 2
+                .
+      IF SY-SUBRC <> 0.
+        MESSAGE A000(ZCL_MESSAGES_DEV15).
+      ENDIF.
+
+    ev_id = lv_random_id.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_ALL_EMPLOYEES
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_EMPLOYEES                   TYPE        ZTT_EMPLOYEES_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_EMPLOYEES.
+
+ SELECT * FROM zemployees_dev15
+   INTO CORRESPONDING FIELDS OF TABLE @et_employees.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_ALL_MANAGERS
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_MANAGERS                    TYPE        ZTT_EMPLOYEES_AND_DEPART_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_all_managers.
+    SELECT * FROM zdeparts_dev15 AS departments
+      INNER JOIN zemployees_dev15 AS emlpoyees
+      ON departments~manager_id = emlpoyees~employee_id
+      INTO CORRESPONDING FIELDS OF TABLE @et_managers.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_ALL_POSITIONS
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_POSITIONS                   TYPE        ZTT_POSITIONS_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_POSITIONS.
+
+   SELECT * FROM zpositions_dev15
+     INTO CORRESPONDING FIELDS OF TABLE @et_positions.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_ALL_SALARIES
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_EMPLOYEE_ID_FILTER          TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [<---] ET_SALARIES                    TYPE        ZTT_SALARIES_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_SALARIES.
+
+IF it_employee_id_filter is NOT INITIAL.
+    SELECT * FROM ZSALARIES_DEV15
+    WHERE employee_id IN @it_employee_id_filter ORDER BY effective_date DESCENDING " to display the latest at the top
+    INTO CORRESPONDING FIELDS OF TABLE @et_salaries.
+  ELSE.
+    SELECT * FROM ZSALARIES_DEV15
+    INTO CORRESPONDING FIELDS OF TABLE @et_salaries.
+ENDIF.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_DEPARTMENT_BY_ID
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_DEPARTMENT_ID               TYPE        ZA_DEPARTMENT_ID_DEV15
+* | [<---] ES_DEPARTMENT                  TYPE        ZDEPARTMENT_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_department_by_id.
+
+    SELECT SINGLE * FROM zdeparts_dev15
+      WHERE department_id = @iv_department_id
+      INTO @es_department.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GET_EMPLOYEES_OF_MANAGER
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_DEPARTMENT_ID               TYPE        ZA_DEPARTMENT_ID_DEV15
+* | [<---] ES_RESULT                      TYPE        ZDEPARTMENT_AND_EMPLOYEES
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_employees_of_manager.
+    DATA: ls_department TYPE zdepartment_dev15.
+
+
+CALL METHOD zcl_services_dev15=>get_department_by_id
+  EXPORTING
+    iv_department_id = iv_department_id
+  IMPORTING
+    es_department    = ls_department
+    .
+
+MOVE-CORRESPONDING ls_department TO es_result.
+
+
+    SELECT employees~employee_id, first_name, last_name, birthdate, employees~department_id, gender, salary_amount, position_id, currency
+      FROM zdeparts_dev15 AS departments
+      INNER JOIN zemployees_dev15 AS employees
+      ON employees~department_id = departments~department_id
+      INNER JOIN zsalaries_dev15 AS salaries
+      ON employees~salary_id = salaries~salary_id
+      WHERE departments~department_id = @iv_department_id
+      AND employees~employee_id <> departments~manager_id         "exclude the manager from the result.
+      INTO CORRESPONDING FIELDS OF TABLE @es_result-employees_and_salaries.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>GIVE_RAISE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_SALARY                      TYPE        ZSALARY_DEV15
+* | [<---] ES_SALARY                      TYPE        ZSALARY_DEV15
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GIVE_RAISE.
+    DATA: ls_employee type zemployee_dev15.
+
+* This function handles the addition of a new salary to an existing employee by using a variety of functions in the class
+
+* Use the received Employee ID from the Salary Structure to select the employee from the Employees table:
+    SELECT SINGLE * FROM zemployees_dev15
+      WHERE employee_id = @is_salary-employee_id
+      INTO CORRESPONDING FIELDS OF @ls_employee.
+
+
+* The received salary will be sent to the "Add_Salary" function to create a new salary
+      CALL METHOD zcl_services_dev15=>add_salary
+        EXPORTING
+          is_salary    = is_salary
+        IMPORTING
+          ev_salary_id = ls_employee-salary_id
+          .
+
+* After the salary was added, update the employee in the Employees table with the new Salary ID
+      CALL METHOD zcl_services_dev15=>update_service_table
+        EXPORTING
+          is_employee    = ls_employee
+        EXCEPTIONS
+          not_found      = 1
+          already_exists = 2
+          others         = 3
+              .
+
+
+      MOVE-CORRESPONDING is_salary TO es_salary.
+      es_salary-effective_date = sy-datum.
+      es_salary-salary_id = ls_employee-salary_id. "return the salary with the new salary id
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>INSERT_TO_SERVICE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_EMPLOYEE                    TYPE        ZEMPLOYEE_DEV15(optional)
+* | [--->] IS_SALARY                      TYPE        ZSALARY_DEV15(optional)
+* | [--->] IS_DEPARTMENT                  TYPE        ZDEPARTMENT_DEV15(optional)
+* | [--->] IS_POSITION                    TYPE        ZPOSITION_DEV15(optional)
+* | [--->] IT_EMPLOYEES                   TYPE        ZTT_EMPLOYEES_DEV15(optional)
+* | [--->] IT_SALARIES                    TYPE        ZTT_SALARIES_DEV15(optional)
+* | [--->] IT_DEPARTMENTS                 TYPE        ZTT_DEPARTMENTS_DEV15(optional)
+* | [--->] IT_POSITIONS                   TYPE        ZTT_POSITIONS_DEV15(optional)
+* | [EXC!] ALREADY_EXISTS
+* | [EXC!] MISSING_DATA
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method INSERT_TO_SERVICE_TABLE.
+
+********************** EMPLOYEES ***********************
+    IF it_employees is not INITIAL.                        "check if the table has values
+      INSERT zemployees_dev15 FROM TABLE @it_employees.
+      ELSEIF is_employee is NOT INITIAL.                    "check if the structure haas values
+        INSERT zemployees_dev15 FROM @is_employee.          "NOTE: if both the structure and the table have values,
+    ENDIF.                                                  "      only the table will be used.
+
+********************* DEOPARTMENTS *********************
+        IF it_departments is not INITIAL.
+      INSERT zdeparts_dev15 FROM TABLE @it_departments.
+      ELSEIF is_department is NOT INITIAL.
+        INSERT zdeparts_dev15 FROM @is_department.
+    ENDIF.
+
+******************** POSITIONS ************************
+    IF it_positions is not INITIAL.
+      INSERT zpositions_dev15 FROM TABLE @it_positions.
+      ELSEIF is_position is NOT INITIAL.
+        INSERT zpositions_dev15 FROM @is_position.
+    ENDIF.
+
+******************* SALARIES *************************
+    IF it_salaries is not INITIAL.
+      INSERT zsalaries_dev15 FROM TABLE @it_salaries.
+      ELSEIF is_salary is NOT INITIAL.
+        INSERT zsalaries_dev15 FROM @is_salary.
+    ENDIF.
+
+
+CASE sy-subrc.
+  WHEN 1.
+    RAISE already_exists.
+  WHEN 2.
+    RAISE missing_data.
+ENDCASE.
+
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_SERVICES_DEV15=>UPDATE_SERVICE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_EMPLOYEE                    TYPE        ZEMPLOYEE_DEV15(optional)
+* | [--->] IS_DEPARTMENT                  TYPE        ZDEPARTMENT_DEV15(optional)
+* | [--->] IS_POSITION                    TYPE        ZPOSITION_DEV15(optional)
+* | [--->] IS_SALARY                      TYPE        ZSALARY_DEV15(optional)
+* | [--->] IT_EMPLOYEES                   TYPE        ZTT_EMPLOYEES_DEV15(optional)
+* | [--->] IT_DEPARTMENTS                 TYPE        ZTT_DEPARTMENTS_DEV15(optional)
+* | [--->] IT_POSITIONS                   TYPE        ZTT_POSITIONS_DEV15(optional)
+* | [--->] IT_SALARIES                    TYPE        ZTT_SALARIES_DEV15(optional)
+* | [EXC!] NOT_FOUND
+* | [EXC!] ALREADY_EXISTS
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method UPDATE_SERVICE_TABLE.
+
+* Updates the service's database tables.
+* Supoorts both single (structure) and multiple (table) entries.
+
+
+********************** EMPLOYEES ***********************
+    IF it_employees is not INITIAL.                        "check if the table has values
+      UPDATE zemployees_dev15 FROM TABLE @it_employees.
+      ELSEIF is_employee is NOT INITIAL.                    "check if the structure haas values
+        UPDATE zemployees_dev15 FROM @is_employee.          "NOTE: if both the structure and the table have values,
+    ENDIF.                                                  "      only the table will be used.
+
+********************* DEOPARTMENTS *********************
+        IF it_departments is not INITIAL.
+      UPDATE zdeparts_dev15 FROM TABLE @it_departments.
+      ELSEIF is_department is NOT INITIAL.
+        UPDATE zdeparts_dev15 FROM @is_department.
+    ENDIF.
+
+******************** POSITIONS ************************
+    IF it_positions is not INITIAL.
+      UPDATE zpositions_dev15 FROM TABLE @it_positions.
+      ELSEIF is_position is NOT INITIAL.
+        UPDATE zpositions_dev15 FROM @is_position.
+    ENDIF.
+
+******************* SALARIES *************************
+    IF it_salaries is not INITIAL.
+      UPDATE zsalaries_dev15 FROM TABLE @it_salaries.
+      ELSEIF is_salary is NOT INITIAL.
+        UPDATE zsalaries_dev15 FROM @is_salary.
+    ENDIF.
+
+    IF sy-subrc = 4.
+      RAISE not_found.
+      ELSEIF sy-subrc = 8.
+        RAISE already_exists.
+    ENDIF.
+
+  endmethod.
+ENDCLASS.

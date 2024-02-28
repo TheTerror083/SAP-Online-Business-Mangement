@@ -1,0 +1,63 @@
+.title1 {
+    font-size: 25px;
+}
+
+.logo {
+    height: 25px;
+    width: 25px;
+}
+
+.form {
+    display: flex;
+    position: relative;
+    top: 100px;
+    border: red outset 1px;
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.lable {
+    font-size: 20px;
+    width: 125px;
+    overflow-wrap: break-word;
+}
+
+.box {
+    display: flex;
+    align-items: center;
+}
+
+.sendbtn {
+    margin-right: 80%;
+}
+
+.homeScreen {
+    display: flex;
+    justify-content: center;
+}
+
+.datesLabel {
+    font-size: 25px;
+}
+
+.tableTitle {
+    font-size: 40px;
+}
+
+.table {
+    max-height: 35%;
+    overflow-x: auto;
+}
+
+.popupBox {
+    max-width: 90%;
+}
+
+.disabledInput input.sapMInputBaseInner {
+    pointer-events: none;
+}

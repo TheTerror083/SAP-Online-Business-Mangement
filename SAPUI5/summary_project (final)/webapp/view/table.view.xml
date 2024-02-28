@@ -1,0 +1,54 @@
+<mvc:View controllerName="summaryproject.controller.table"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+            <Page showHeader="true" id="page" title="{i18n>title}" class="sapUiResponsiveContentPadding">
+                <content>
+                <HBox  id="routeHeader">
+                    <Button id="btnID" text="Salaries" class="sapUiTinyMarginEnd" press="navigateToSalaries" />
+                    <Button id="disa" text="Departments and Employees" class="sapUiTinyMarginEnd" enabled="false" />
+                </HBox>
+                <Title id="managerTitle" text="Manager Table" class="tableTitle"></Title>
+                <Table items="{/tableData}" id="myTableId" class="table" sticky="ColumnHeaders">
+                    <columns>
+                    <!-- Dynamic creation of columns in the controller -->
+                    </columns>
+                    <items>
+                    <ColumnListItem id="column" type="Active" press="onRowPress">
+                        <cells>
+                            <Text id="emp_id" text="{EmployeeId}" />
+                            <Text id="fname" text="{FirstName}" />
+                            <Text id="lname" text="{LastName}" />
+                            <Text id="bdate" text="{Birthdate}" />
+                            <Text id="gender" text="{Gender}" />
+                            <Text id="dep_id" text="{DepartmentId}" />
+                            <Text id="pos_id" text="{PositionId}" />
+                            <Button id="ActionButton" text="{i18n>empButton}" press="fillEmployeeTable"></Button>
+                        </cells>
+                    </ColumnListItem>
+                    </items>
+                </Table>
+
+               <Title id="employeeTitle" text="Employee Table" class="tableTitle"></Title>
+                <Table items="{/empViewTableData}" id="employeeTableId" class="table" sticky="ColumnHeaders">
+                    <columns>
+                    <!-- Dynamic creation of columns in the controller -->
+                    </columns>
+                    <items>
+                    <ColumnListItem id="employeeColumn" press="onRowPress">
+                        <cells>
+                            <Text id="t1" text="{EmployeeId}" />
+                            <Text id="t2" text="{FirstName}" />
+                            <Text id="t3" text="{LastName}" />
+                            <Text id="t4" text="{Birthdate}" />
+                            <Text id="t5" text="{Gender}" />
+                            <Text id="t6" text="{DepartmentId}" />
+                            <Text id="t7" text="{SalaryAmount}" />
+                            <Text id="t8" text="{Currency}" />
+                        </cells>
+                    </ColumnListItem>
+                    </items>
+                </Table> 
+                <Button id="addEmployeeButton" text="{i18n>addEmpButton}" press="openPopup" enabled="{/btnEnabled}" ></Button>
+                </content>
+            </Page>
+</mvc:View>

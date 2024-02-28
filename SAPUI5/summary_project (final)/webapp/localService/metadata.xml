@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZHA_SUM_SRV_DEV15_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="Employee" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="EmployeeId"/>
+                </Key>
+                <Property Name="EmployeeId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Employee_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FirstName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="First_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LastName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Last_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Birthdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Birthdate" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gender" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Gender" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DepartmentId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Department_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PositionId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Position_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SalaryId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Salary_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="Department" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="DepartmentId"/>
+                </Key>
+                <Property Name="DepartmentId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Department_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DepartmentName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Department_name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="ManagerId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Manager_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <NavigationProperty Name="EmployeesAndSalaries" Relationship="ZHA_SUM_SRV_DEV15_SRV.employeesOfDepartment" FromRole="FromRole_employeesOfDepartment" ToRole="ToRole_employeesOfDepartment"/>
+            </EntityType>
+            <EntityType Name="Position" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="PositionId"/>
+                </Key>
+                <Property Name="PositionId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Position_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PositionTitle" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Position_Title" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="Salary" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="SalaryId"/>
+                </Key>
+                <Property Name="SalaryId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Salary_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="EmployeeId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Employee_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Currency" Type="Edm.String" Nullable="false" MaxLength="5" sap:unicode="false" sap:label="Salary_amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="currency-code"/>
+                <Property Name="EffectiveDate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Effective_date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SalaryAmount" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="3" sap:unicode="false" sap:unit="Currency" sap:label="Salary_amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityType Name="EmployeeAndSalary" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="EmployeeId"/>
+                </Key>
+                <Property Name="EmployeeId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Employee_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FirstName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="First_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LastName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Last_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Birthdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Birthdate" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gender" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Gender" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DepartmentId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Department_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PositionId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Position_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SalaryAmount" Type="Edm.Decimal" Nullable="false" Precision="11" Scale="3" sap:unicode="false" sap:label="Salary_amount" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Currency" Type="Edm.String" Nullable="false" MaxLength="5" sap:unicode="false" sap:label="Currency" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" sap:semantics="currency-code"/>
+            </EntityType>
+            <EntityType Name="ManagerAndDepartment" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="EmployeeId"/>
+                </Key>
+                <Property Name="EmployeeId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Employee_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="FirstName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="First_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="LastName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Last_Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Birthdate" Type="Edm.DateTime" Nullable="false" Precision="7" sap:unicode="false" sap:label="Birthdate" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="Gender" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Gender" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DepartmentName" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Department_name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="PositionId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Position_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="SalaryId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Salary_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="DepartmentId" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:label="Department_id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <Association Name="employeesOfDepartment" sap:content-version="1">
+                <End Type="ZHA_SUM_SRV_DEV15_SRV.Department" Multiplicity="1" Role="FromRole_employeesOfDepartment"/>
+                <End Type="ZHA_SUM_SRV_DEV15_SRV.EmployeeAndSalary" Multiplicity="*" Role="ToRole_employeesOfDepartment"/>
+                <ReferentialConstraint>
+                    <Principal Role="FromRole_employeesOfDepartment">
+                        <PropertyRef Name="DepartmentId"/>
+                    </Principal>
+                    <Dependent Role="ToRole_employeesOfDepartment">
+                        <PropertyRef Name="EmployeeId"/>
+                    </Dependent>
+                </ReferentialConstraint>
+            </Association>
+            <EntityContainer Name="ZHA_SUM_SRV_DEV15_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="EmployeeSet" EntityType="ZHA_SUM_SRV_DEV15_SRV.Employee" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="DepartmentSet" EntityType="ZHA_SUM_SRV_DEV15_SRV.Department" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="PositionSet" EntityType="ZHA_SUM_SRV_DEV15_SRV.Position" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="SalarySet" EntityType="ZHA_SUM_SRV_DEV15_SRV.Salary" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:content-version="1"/>
+                <EntitySet Name="EmployeeAndSalarySet" EntityType="ZHA_SUM_SRV_DEV15_SRV.EmployeeAndSalary" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <EntitySet Name="ManagerAndDepartmentSet" EntityType="ZHA_SUM_SRV_DEV15_SRV.ManagerAndDepartment" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+                <AssociationSet Name="employeesOfDepartment_AssocSet" Association="ZHA_SUM_SRV_DEV15_SRV.employeesOfDepartment" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+                    <End EntitySet="DepartmentSet" Role="FromRole_employeesOfDepartment"/>
+                    <End EntitySet="EmployeeAndSalarySet" Role="ToRole_employeesOfDepartment"/>
+                </AssociationSet>
+            </EntityContainer>
+            <atom:link rel="self" href="http://35.222.88.198:50000/sap/opu/odata/SAP/ZHA_SUM_SRV_DEV15_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="http://35.222.88.198:50000/sap/opu/odata/SAP/ZHA_SUM_SRV_DEV15_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>

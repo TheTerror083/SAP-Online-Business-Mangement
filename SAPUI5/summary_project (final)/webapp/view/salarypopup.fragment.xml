@@ -1,0 +1,38 @@
+<core:FragmentDefinition xmlns:form="sap.ui.layout.form" xmlns:odata="sap.ui.comp.odata"
+  xmlns="sap.m"
+  controllerName="summaryproject.controller.salary"
+  xmlns:core="sap.ui.core">
+
+  <Dialog
+    id="salPopupFragment"
+    title="{i18n>salPopupTitle}">
+    <form:SimpleForm  id="salInpForm">
+      <VBox id="salvb">
+        <HBox id="salhb1">
+          <Text id="popEmpID" text="{i18n>emp_id}:"></Text> 
+          <Input id="inpEmployeeId" enabled="false" value="{/selectedEmployee}"></Input>
+        </HBox>
+        <HBox id="salhb2">
+          <Text id="popSalAmnt" text="{i18n>sal_amo}:"></Text> 
+          <Input id="inpSalaryAmount" type="Number" placeholder="{i18n>sal_amo}" ></Input>
+        </HBox>
+        <HBox id="salhb3">
+          <Text id="popCurr" text="{i18n>curr}:"></Text> 
+          <Select id="inpCurr" selectedItem="USD">
+            <core:Item id="USD" key="USD" text="USD"></core:Item>
+            <core:Item id="EUR" key="EUR" text="EUR"></core:Item>
+            <core:Item id="GBP" key="GBP" text="GBP"></core:Item>
+          </Select>
+        </HBox>
+      </VBox>
+    </form:SimpleForm>
+    <beginButton>
+        <Button text="{i18n>btnApprove}" press="submit" id="approveBtn"></Button>
+    </beginButton>
+    <endButton>
+        <Button text="{i18n>btnCancel}" press="closePop" id="cancelBtn"></Button>
+    </endButton>
+
+  </Dialog>
+
+</core:FragmentDefinition>

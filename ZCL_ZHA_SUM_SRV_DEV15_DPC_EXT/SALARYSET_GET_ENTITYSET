@@ -1,0 +1,27 @@
+  method SALARYSET_GET_ENTITYSET.
+
+        DATA: lt_filter               TYPE /iwbep/t_mgw_select_option,
+          lt_employee_id_filter       TYPE /iwbep/t_cod_select_options.
+
+    DATA(lo_filter) = io_tech_request_context->get_filter( ).
+    lt_filter = lo_filter->get_filter_select_options( ).
+
+
+     LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(<ls_filter>).
+      CASE <ls_filter>-property.
+        WHEN 'EMPLOYEE_ID'.
+          lt_employee_id_filter = <ls_filter>-select_options.
+      ENDCASE.
+
+    ENDLOOP.
+
+
+CALL METHOD zcl_services_dev15=>get_all_salaries
+  EXPORTING
+    it_employee_id_filter =   lt_employee_id_filter
+  IMPORTING
+    et_salaries = et_entityset
+    .
+
+
+  endmethod.

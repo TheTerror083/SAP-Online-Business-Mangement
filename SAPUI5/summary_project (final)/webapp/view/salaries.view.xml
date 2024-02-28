@@ -1,0 +1,55 @@
+<mvc:View controllerName="summaryproject.controller.salaries"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m">
+            <Page showHeader="true" id="salPage" title="Salaries" class="sapUiResponsiveContentPadding">
+                <content>
+                    <HBox  id="routeHeader">
+                        <Button id="disa"  text="Salaries" class="sapUiTinyMarginEnd" enabled="false" />
+                        <Button id="btnID" text="Departments and Employees" class="sapUiTinyMarginEnd" press="navigateToDepartments" />
+                    </HBox>
+
+                    <Title id="employeeTitle" text="Employee Table" class="tableTitle"></Title>
+                    <Table items="{/empViewTableData}" id="employeeTableId" class="table" sticky="ColumnHeaders">
+                        <columns>
+                        <!-- Dynamic creation of columns in the controller -->
+                        </columns>
+                        <items>
+                        <ColumnListItem id="employeeColumn" type="Active" press="onRowPress">
+                            <cells>
+                                <Text id="t1" text="{EmployeeId}" />
+                                <Text id="t2" text="{FirstName}" />
+                                <Text id="t3" text="{LastName}" />
+                                <Text id="t4" text="{Birthdate}" />
+                                <Text id="t5" text="{Gender}" />
+                                <Text id="t6" text="{DepartmentId}" />
+                                <Text id="t7" text="{SalaryId}" />
+                                <Button id="ActionButton" text="{i18n>salButton}" press="fillSalaryTable"></Button>
+                            </cells>
+                        </ColumnListItem>
+                        </items>
+                    </Table> 
+
+                    <Title id="salariesTitle" text="Salaries Table" class="tableTitle"></Title>
+                    <Table items="{ path: '/tableData',  sorter: { path: 'EffectiveDate', descending: true}}" id="salTableId" class="table" sticky="ColumnHeaders">
+                    <columns>
+                    <!-- Dynamic creation of columns in the controller -->
+                    </columns>
+                    <items>
+                    <ColumnListItem id="column" type="Active" press="onRowPress">
+                        <cells>
+                            <Text id="sal_id" text="{SalaryId}" />
+                            <Text id="emp_id" text="{EmployeeId}" />
+                            <Text id="sal_amo" text="{SalaryAmount}" />
+                            <Text id="curr" text="{Currency}" />
+                            <Text id="eff_date" text="{EffectiveDate}" />
+                        </cells>
+                    </ColumnListItem>
+                    </items>
+                </Table>
+                <Button id="addSalButton" text="{i18n>addSalButton}" enabled="{/addSalEnabled}" press="showPopup"></Button>
+
+
+
+                </content>
+            </Page>
+</mvc:View>

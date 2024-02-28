@@ -1,0 +1,9 @@
+  method POSITIONSET_GET_ENTITYSET.
+
+  CALL METHOD zcl_services_dev15=>get_all_positions
+    IMPORTING
+      et_positions = et_entityset
+      .
+
+
+  endmethod.

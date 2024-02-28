@@ -1,0 +1,64 @@
+<core:FragmentDefinition xmlns:form="sap.ui.layout.form" xmlns:odata="sap.ui.comp.odata"
+  xmlns="sap.m"
+  controllerName="summaryproject.controller.table"
+  xmlns:core="sap.ui.core">
+
+  <Dialog
+    id="myPopupFragment"
+    title="{i18n>empPopupTitle}">
+    <form:SimpleForm  id="inpForm">
+      <VBox id="vb">
+        <HBox id="hb1">
+          <Text id="popFName" text="{i18n>fname}:"></Text> 
+          <Input id="inpFirstName" placeholder="{i18n>fname}" ></Input>
+        </HBox>
+        <HBox id="hb2">
+          <Text id="popLName" text="{i18n>lname}:"></Text> 
+          <Input id="inpLastName" placeholder="{i18n>lname}"></Input>
+        </HBox>
+        <HBox id="hb3">
+          <Text id="popGender" text="{i18n>gender}:"></Text> 
+          <Select id="inpGender" selectedItem="Male">
+            <core:Item id="male" key="M" text="Male"></core:Item>
+            <core:Item id="female" key="F" text="Female"></core:Item>
+          </Select>
+        </HBox>
+        <HBox id="hb4">
+          <Text id="popBDate" text="{i18n>bdate}:"></Text> 
+            <DatePicker valueFormat="YYYYMMdd" id="inpBirthdate" placeholder="Enter Date" value="20230101" change="handleChange"
+            class="disabledInput" showFooter="true"/>
+        </HBox>
+        <HBox id="hb5">
+          <Text id="popDepID" text="{i18n>dep_id}:"></Text> 
+          <Input id="inpDepartmentId" enabled="false" value="{/selectedDepartment}"></Input>
+        </HBox>
+        <HBox id="hb6">
+          <Text id="popPosID" text="{i18n>pos_id}:"></Text> 
+            <Select id="inputPosId" items="{popupModel>/positions}" >
+              <core:Item id="itm" key="{popupModel>PositionId}" text="{popupModel>PositionId}" />
+          </Select>
+        </HBox>
+        <HBox id="hb7">
+          <Text id="popSalAmnt" text="{i18n>sal_amo}:"></Text> 
+          <Input type="Number" id="inpSalaryAmount" placeholder="{i18n>sal_amo}" ></Input>
+        </HBox>
+        <HBox id="hb8">
+          <Text id="popCurr" text="{i18n>curr}:"></Text> 
+          <Select id="inpCurr" selectedItem="USD">
+            <core:Item id="USD" key="USD" text="USD"></core:Item>
+            <core:Item id="EUR" key="EUR" text="EUR"></core:Item>
+            <core:Item id="GBP" key="GBP" text="GBP"></core:Item>
+          </Select>
+        </HBox>
+      </VBox>
+    </form:SimpleForm>
+    <beginButton>
+        <Button text="{i18n>btnApprove}" press="approve" id="approveBtn"></Button>
+    </beginButton>
+    <endButton>
+        <Button text="{i18n>btnCancel}" press="closePopup" id="cancelBtn"></Button>
+    </endButton>
+
+  </Dialog>
+
+</core:FragmentDefinition>

@@ -1,0 +1,18 @@
+  method SALARYSET_CREATE_ENTITY.
+    DATA: ls_entity TYPE zcl_zha_sum_srv_dev15_mpc_ext=>ts_salary.
+
+    io_data_provider->read_entry_data(
+      IMPORTING
+        es_data                      = ls_entity
+    ).
+
+* The following function handles the addition of a salary to an existing of employee
+* as well as updating the salary id in the employee table accordingly
+CALL METHOD zcl_services_dev15=>give_raise
+   EXPORTING
+     is_salary = ls_entity
+  IMPORTING
+    es_salary = er_entity
+    .
+
+  endmethod.

@@ -1,0 +1,18 @@
+  METHOD employeeandsalar_create_entity.
+    DATA: ls_employee_salary_entity TYPE zcl_zha_sum_srv_dev15_mpc_ext=>ts_employeeandsalary.
+
+    io_data_provider->read_entry_data(
+      IMPORTING
+        es_data                      = ls_employee_salary_entity
+    ).
+
+
+    CALL METHOD zcl_services_dev15=>add_employee_and_salary
+      EXPORTING
+        is_employee_salary = ls_employee_salary_entity
+      IMPORTING
+        es_employee_salary = ls_employee_salary_entity " MIGHT BE REMOVED IF NOT USED
+        .
+
+  MOVE-CORRESPONDING ls_employee_salary_entity TO er_entity.
+  ENDMETHOD.

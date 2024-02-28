@@ -1,0 +1,7 @@
+  method MANAGERANDDEPART_GET_ENTITYSET.
+
+CALL METHOD zcl_services_dev15=>get_all_managers
+  IMPORTING
+    et_managers = et_entityset.
+    .
+  endmethod.

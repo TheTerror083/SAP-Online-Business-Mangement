@@ -1,0 +1,89 @@
+*&---------------------------------------------------------------------*
+*& Report ZA_FILL_TABLES_DEV15
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT za_fill_tables_dev15.
+
+DELETE FROM zemployees_dev15.
+DELETE FROM zdeparts_dev15.
+DELETE FROM zsalaries_dev15.
+DELETE FROM zpositions_dev15.
+
+
+DATA: lt_sal_temp TYPE STANDARD TABLE OF zsalaries_dev15.
+
+
+TYPES: BEGIN OF ts_employees_temp,
+            employee_id   TYPE char50,
+            first_name    TYPE char50,
+            last_name     TYPE char50,
+            gender        TYPE char50,
+            birthdate     TYPE char50,
+            department_id TYPE char50,
+            position_id   TYPE char50,
+            salary_id     TYPE char50,
+       END OF ts_employees_temp,
+
+
+
+        BEGIN OF ts_salary_temp,
+          salary_id       TYPE char50,
+          employee_id     TYPE char50,
+          salary_amount   TYPE char50,
+          currency        TYPE char50,
+          effective_date  TYPE char50,
+          END OF ts_salary_temp.
+
+DATA: lt_employees            TYPE STANDARD TABLE OF zemployees_dev15,
+      ls_employee             TYPE zemployee_dev15,
+      lt_employees_temp       TYPE STANDARD TABLE OF ts_employees_temp,
+      ls_employee_temp        TYPE ts_employees_temp,
+
+
+      lt_departments          TYPE STANDARD TABLE OF zdeparts_dev15,
+      lt_positions            TYPE STANDARD TABLE OF zpositions_dev15,
+
+      ls_salary               TYPE zsalary_dev15,
+      lt_salaries             TYPE STANDARD TABLE OF zsalaries_dev15,
+      ls_salary_temp          TYPE ts_salary_temp,
+      lt_salaries_temp        TYPE STANDARD TABLE OF ts_salary_temp.
+
+
+
+
+
+SELECT * FROM zemployees_sum
+  INTO CORRESPONDING FIELDS OF TABLE @lt_employees_temp. "need to convert the birthdate from string to date type.
+
+LOOP AT lt_employees_temp INTO ls_employee_temp.
+
+MOVE-CORRESPONDING ls_employee_temp TO ls_employee.
+APPEND ls_employee TO  lt_employees.
+ENDLOOP.
+
+
+*********************** CHAR ONLY TABLES ***********************
+
+SELECT * FROM zdepartments_sum
+  INTO CORRESPONDING FIELDS OF TABLE @lt_departments.
+
+
+SELECT * FROM zpositions_sum
+  INTO CORRESPONDING FIELDS OF TABLE @lt_positions.
+
+*********************** END OF CHAR ONLY TABLES ******************
+
+SELECT * FROM zsalaries_sum
+  INTO CORRESPONDING FIELDS OF TABLE @lt_salaries_temp.
+
+  LOOP AT lt_salaries_temp INTO ls_salary_temp.
+    ls_salary_temp-currency = 'USD'.                    "since zsalaries_SUM lacks a currency field, set all entries currency to USD
+    MOVE-CORRESPONDING ls_salary_temp TO ls_salary.
+    APPEND ls_salary TO lt_salaries.
+  ENDLOOP.
+
+INSERT zemployees_dev15 FROM TABLE @lt_employees.
+INSERT zdeparts_dev15 FROM TABLE @lt_departments.
+INSERT zpositions_dev15 FROM TABLE @lt_positions.
+INSERT zsalaries_dev15 FROM TABLE @lt_salaries.
