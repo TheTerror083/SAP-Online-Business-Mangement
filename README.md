@@ -11,6 +11,7 @@ Employees:
 - When a new Employee is added, a new Salary is added as well.
 
 Salaries:
+- Uses a Currency field to determine in which currency the Salary is paid.
 - Can be added for a selected Employee through the client's ui.
 - A history of each Employee's Salaries as well as its' effective dates is stored in the OData service.
 - A single Employee can have multiple Salaries in history, but only the latest will be displayed in the Employee table.
