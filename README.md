@@ -1,8 +1,10 @@
 # SAP-Online-Business-Mangement
 SAP company management program. utilizes SAPUI5 and ABAP. Grade 105.
+
 Manages Employees, Salaries, Positions and Departments of a Company.
 
 Translated to both Hebrew and English.
+
 Employees:
 - Can be added throught the ui.
 - Positions are automatically filled at the ui by reading them from the OData service.
